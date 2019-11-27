@@ -172,4 +172,6 @@ def main():
     print(end-start,'seconds')
 
 if __name__ == '__main__':
+    #aaa = os.makedirs('a/b')
+    #print(aaa)
     main()
