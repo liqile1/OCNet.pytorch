@@ -30,16 +30,17 @@ from pyramid_oc_block import Pyramid_OC_Module
 
 torch_ver = torch.__version__[:3]
 
-if torch_ver == '0.4':
-    sys.path.append(os.path.join(BASE_DIR, '../inplace_abn'))
-    from bn import InPlaceABNSync
-    BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')
+# if torch_ver == '0.4':
+#     sys.path.append(os.path.join(BASE_DIR, '../inplace_abn'))
+#     from bn import InPlaceABNSync
+#     BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')
     
-elif torch_ver == '0.3':
-    sys.path.append(os.path.join(BASE_DIR, '../inplace_abn_03'))
-    from modules import InPlaceABNSync
-    BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')    
+# elif torch_ver == '0.3':
+#     sys.path.append(os.path.join(BASE_DIR, '../inplace_abn_03'))
+#     from modules import InPlaceABNSync
+#     BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')    
 
+BatchNorm2d = nn.BatchNorm2d
 
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes):
