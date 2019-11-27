@@ -20,19 +20,19 @@ import functools
 
 torch_ver = torch.__version__[:3]
 
-# if torch_ver == '0.4':
-#     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-#     sys.path.append(os.path.join(BASE_DIR, '../inplace_abn'))
-#     from bn import InPlaceABNSync
-#     BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')
+if torch_ver == '0.4':
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.join(BASE_DIR, '../inplace_abn'))
+    from bn import InPlaceABNSync
+    BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')
     
-# elif torch_ver == '0.3':
-#     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-#     sys.path.append(os.path.join(BASE_DIR, '../inplace_abn_03'))
-#     from modules import InPlaceABNSync
-#     BatchNorm2d = functools.partial(InPlaceABNSync, activation='none') 
+elif torch_ver == '0.3':
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.join(BASE_DIR, '../inplace_abn_03'))
+    from modules import InPlaceABNSync
+    BatchNorm2d = functools.partial(InPlaceABNSync, activation='none') 
 
-BatchNorm2d = nn.BatchNorm2d
+
 class _SelfAttentionBlock(nn.Module):
     '''
     The basic implementation for self-attention block/non-local block
