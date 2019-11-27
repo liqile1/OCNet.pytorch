@@ -14,7 +14,7 @@ LEARNING_RATE=1e-2
 WEIGHT_DECAY=5e-4
 START_ITERS=0
 MAX_ITERS=5000
-BATCHSIZE=8
+BATCHSIZE=1
 INPUT_SIZE='512,512'
 USE_CLASS_BALANCE=True
 USE_OHEM=False
@@ -36,7 +36,7 @@ SNAPSHOT_DIR="./checkpoint/snapshots_${NETWORK}_${METHOD}_${LEARNING_RATE}_${WEI
 ########################################################################################################################
 #  Training
 ########################################################################################################################
-python train_leadbang.py --network $NETWORK --method $METHOD --random-mirror --random-scale --gpu 0,1,2,3 --batch-size $BATCHSIZE \
+python train_leadbang.py --network $NETWORK --method $METHOD --random-mirror --random-scale --gpu 1,2,3 --batch-size $BATCHSIZE \
   --snapshot-dir $SNAPSHOT_DIR  --num-steps $MAX_ITERS --ohem $USE_OHEM --data-list $DATA_LIST_PATH --weight-decay $WEIGHT_DECAY \
   --input-size $INPUT_SIZE --ohem-thres $OHEMTHRES --ohem-keep $OHEMKEEP --use-val $USE_VAL_SET --use-weight $USE_CLASS_BALANCE \
   --snapshot-dir $SNAPSHOT_DIR --restore-from $RESTORE_FROM --start-iters $START_ITERS --learning-rate $LEARNING_RATE  \

@@ -48,6 +48,7 @@ class LeadBangTrain(data.Dataset):
             label_path = 'label/' + str(item_idx) + ".bmp"
             img_file = osp.join(self.root, img_path)
             label_file = osp.join(self.root, label_path)
+            print('label file: ', label_file)
             self.files.append({
                 "img": img_file,
                 "label": label_file,

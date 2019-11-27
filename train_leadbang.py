@@ -62,6 +62,7 @@ def main():
     torch.manual_seed(args.seed)
 
     writer = SummaryWriter(args.snapshot_dir)
+    print(args.gpu)
     os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu
     h, w = map(int, args.input_size.split(','))
     input_size = (h, w)
@@ -99,12 +100,14 @@ def main():
     else:
         deeplab.load_state_dict(new_params)
 
-    model = DataParallelModel(deeplab)
-    # model = nn.DataParallel(deeplab)
-    model.train()     
-    model.float()
-    model.cuda()    
-
+    #model = DataParallelModel(deeplab)
+    ## model = nn.DataParallel(deeplab)
+    #model.train()     
+    #model.float()
+    #model.cuda()    
+    model = deeplab
+    device=torch.device("cuda:1")
+    model = model.to(device)
     criterion = CriterionCrossEntropy()
     if "dsn" in args.method:
         if args.ohem:
@@ -116,9 +119,9 @@ def main():
         else:
             criterion = CriterionDSN(dsn_weight=float(args.dsn_weight), use_weight=True)
 
-
-    criterion = DataParallelCriterion(criterion)
-    criterion.cuda()
+    criterion = criterion.to(device)
+    #criterion = DataParallelCriterion(criterion)
+    #criterion.cuda()
     cudnn.benchmark = True
 
 
@@ -135,11 +138,13 @@ def main():
     optimizer.zero_grad()
 
     for i_iter, batch in enumerate(trainloader):
-        sys.stdout.flush()
+        # sys.stdout.flush()
         i_iter += args.start_iters
         images, labels, _, _ = batch
-        images = Variable(images.cuda())
-        labels = Variable(labels.long().cuda())
+        images = images.to(device)
+        labels = labels.to(device)
+        #images = Variable(images.cuda())
+        #labels = Variable(labels.long().cuda())
         optimizer.zero_grad()
         lr = adjust_learning_rate(optimizer, i_iter)
         if args.fix_lr:
@@ -147,13 +152,19 @@ def main():
         print('learning_rate: {}'.format(lr))
 
         if 'gt' in args.method:
+            print('gt')
             preds = model(images, labels)
         else:
+            print('ngt')
             preds = model(images)
+        print('los')
+        print(preds)
         loss = criterion(preds, labels)
+        print('loss')
         loss.backward()
+        print('a')
         optimizer.step()
-
+        print('b')
         if i_iter % 100 == 0:
             writer.add_scalar('learning_rate', lr, i_iter)
             writer.add_scalar('loss', loss.data.cpu().numpy(), i_iter)
