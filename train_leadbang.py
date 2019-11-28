@@ -68,7 +68,7 @@ def main():
     input_size = (h, w)
     cudnn.enabled = True
 
-    deeplab = get_segmentation_model("_".join([args.network, args.method]), num_classes=args.num_classes)
+    deeplab = get_segmentation_model("_".join([args.network, args.method]), num_classes=2)
 
     saved_state_dict = torch.load(args.restore_from)
     new_params = deeplab.state_dict().copy()
@@ -100,14 +100,14 @@ def main():
     else:
         deeplab.load_state_dict(new_params)
 
-    #model = DataParallelModel(deeplab)
-    ## model = nn.DataParallel(deeplab)
-    #model.train()     
-    #model.float()
-    #model.cuda()    
-    model = deeplab
-    device=torch.device("cuda:1")
-    model = model.to(device)
+    model = DataParallelModel(deeplab)
+    # model = nn.DataParallel(deeplab)
+    model.train()     
+    model.float()
+    model.cuda()    
+    #model = deeplab
+    #device=torch.device("cuda:1")
+    #model = model.to(device)
     criterion = CriterionCrossEntropy()
     if "dsn" in args.method:
         if args.ohem:
@@ -119,9 +119,9 @@ def main():
         else:
             criterion = CriterionDSN(dsn_weight=float(args.dsn_weight), use_weight=True)
 
-    criterion = criterion.to(device)
-    #criterion = DataParallelCriterion(criterion)
-    #criterion.cuda()
+    #criterion = criterion.to(device)
+    criterion = DataParallelCriterion(criterion)
+    criterion.cuda()
     cudnn.benchmark = True
 
 
@@ -136,48 +136,57 @@ def main():
 
 
     optimizer.zero_grad()
+    print('save pred every: ', args.save_pred_every)
 
-    for i_iter, batch in enumerate(trainloader):
+    for epoch in range(5000):
+      for i_iter, batch in enumerate(trainloader):
         # sys.stdout.flush()
         i_iter += args.start_iters
         images, labels, _, _ = batch
-        images = images.to(device)
-        labels = labels.to(device)
-        #images = Variable(images.cuda())
-        #labels = Variable(labels.long().cuda())
+        #images = images.to(device)
+        #labels = labels.to(device)
+        images = Variable(images.cuda())
+        labels = Variable(labels.long().cuda())
         optimizer.zero_grad()
-        lr = adjust_learning_rate(optimizer, i_iter)
-        if args.fix_lr:
-            lr = args.learning_rate
-        print('learning_rate: {}'.format(lr))
+        lr = 0.01
+        if epoch > 200:
+          lr = 0.001
+        if epoch > 2000:
+          lr = 0.0001
+        #lr = adjust_learning_rate(optimizer, epoch)
+        #if args.fix_lr:
+        #    lr = args.learning_rate
+        if i_iter == 0:
+         print('learning_rate: {}'.format(lr))
 
         if 'gt' in args.method:
-            print('gt')
+            #print('gt')
             preds = model(images, labels)
         else:
-            print('ngt')
+            #print('ngt')
             preds = model(images)
-        print('los')
-        print(preds)
+        #print('los')
+        #print(preds)
         loss = criterion(preds, labels)
-        print('loss')
+        #print('loss')
         loss.backward()
-        print('a')
+        #print('a')
         optimizer.step()
-        print('b')
-        if i_iter % 100 == 0:
-            writer.add_scalar('learning_rate', lr, i_iter)
-            writer.add_scalar('loss', loss.data.cpu().numpy(), i_iter)
-        print('iter = {} of {} completed, loss = {}'.format(i_iter, args.num_steps, loss.data.cpu().numpy()))
+        #print('b')
+        #if i_iter % 100 == 0:
+        #    writer.add_scalar('learning_rate', lr, i_iter)
+        #    writer.add_scalar('loss', loss.data.cpu().numpy(), i_iter)
+        if i_iter % 10 == 0:
+            print('>epoch{} iter = {} of 1462 completed, loss = {}'.format(epoch, i_iter, loss.data.cpu().numpy()))
 
-        if i_iter >= args.num_steps-1:
+      if epoch >= args.num_steps-1:
             print('save model ...')
             torch.save(deeplab.state_dict(),osp.join(args.snapshot_dir, 'CS_scenes_'+str(args.num_steps)+'.pth'))
             break
 
-        if i_iter % args.save_pred_every == 0:
+      if epoch % 10 == 0:
             print('taking snapshot ...')
-            torch.save(deeplab.state_dict(),osp.join(args.snapshot_dir, 'CS_scenes_'+str(i_iter)+'.pth'))     
+            torch.save(deeplab.state_dict(),osp.join(args.snapshot_dir, 'CS_scenes_'+str(epoch)+'.pth'))     
 
     end = timeit.default_timer()
     print(end-start,'seconds')

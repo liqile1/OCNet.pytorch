@@ -31,7 +31,7 @@ elif torch_ver == '0.3':
     sys.path.append(os.path.join(BASE_DIR, '../inplace_abn_03'))
     from modules import InPlaceABNSync
     BatchNorm2d = functools.partial(InPlaceABNSync, activation='none') 
-
+BatchNorm2d = nn.BatchNorm2d
 
 class _SelfAttentionBlock(nn.Module):
     '''
@@ -60,7 +60,8 @@ class _SelfAttentionBlock(nn.Module):
         self.f_key = nn.Sequential(
             nn.Conv2d(in_channels=self.in_channels, out_channels=self.key_channels,
                 kernel_size=1, stride=1, padding=0),
-            InPlaceABNSync(self.key_channels),
+            #InPlaceABNSync(self.key_channels),
+            nn.BatchNorm2d(self.key_channels),
         )
         self.f_query = self.f_key
         self.f_value = nn.Conv2d(in_channels=self.in_channels, out_channels=self.value_channels,
@@ -123,7 +124,8 @@ class BaseOC_Module(nn.Module):
         self.stages = nn.ModuleList([self._make_stage(in_channels, out_channels, key_channels, value_channels, size) for size in sizes])        
         self.conv_bn_dropout = nn.Sequential(
             nn.Conv2d(2*in_channels, out_channels, kernel_size=1, padding=0),
-            InPlaceABNSync(out_channels),
+            #InPlaceABNSync(out_channels),
+            nn.BatchNorm2d(out_channels),
             nn.Dropout2d(dropout)
             )
 
@@ -160,7 +162,8 @@ class BaseOC_Context_Module(nn.Module):
         self.stages = nn.ModuleList([self._make_stage(in_channels, out_channels, key_channels, value_channels, size) for size in sizes])
         self.conv_bn_dropout = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=1, padding=0),
-            InPlaceABNSync(out_channels),
+            #InPlaceABNSync(out_channels),
+            nn.BatchNorm2d(out_channels),
             )
 
     def _make_stage(self, in_channels, output_channels, key_channels, value_channels, size):

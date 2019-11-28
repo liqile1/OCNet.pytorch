@@ -300,9 +300,9 @@ def main():
 
     result = {}
     for index, batch in enumerate(testloader):
-        if index % 100 == 0:
-            print('%d processd'%(index))
-            sys.stdout.flush()
+        #if index % 100 == 0:
+        #    print('%d processd'%(index))
+        #    sys.stdout.flush()
         image, label, size, name = batch
         size = size[0].numpy()
         if torch_ver == '0.3':
@@ -339,12 +339,13 @@ def main():
                                 args.method, scale=float(args.whole_scale))
 
         seg_pred = np.asarray(np.argmax(output, axis=3), dtype=np.uint8)
+        seg_pred = np.reshape((output.shape[1], output.shape[2]))
         seg_pred = 255 - 255 * seg_pred
         result[name] = seg_pred
             
     for name in result:
         fpath = './dataset/leadbang/test_result/' + name + '.bmp'
-        cv2.imwrite(fpath, result[name])
+        cv2.imwrite(fpath, result[name[0]])
 
 if __name__ == '__main__':
     main()

@@ -36,10 +36,10 @@ SNAPSHOT_DIR="./checkpoint/snapshots_${NETWORK}_${METHOD}_${LEARNING_RATE}_${WEI
 TEST_USE_FLIP=False
 TEST_USE_MS=False
 TEST_STORE_RESULT=False
-TEST_BATCHSIZE=4
+TEST_BATCHSIZE=1
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="${SNAPSHOT_DIR}CS_scenes_${MAX_ITERS}.pth"
+TEST_RESTORE_FROM="${SNAPSHOT_DIR}CS_scenes_600.pth"
 
 
 ########################################################################################################################
@@ -51,7 +51,6 @@ TEST_DATA_LIST_PATH="t"
 TEST_LOG_FILE="./log/log_test/log_result_${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}_${PREDICT_CHOICE}"
 TEST_OUTPUT_PATH="./visualize/${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}/"
 
-python -u eval.py --network=$NETWORK --method=$METHOD --batch-size=$TEST_BATCHSIZE --data-list $TEST_DATA_LIST_PATH --dataset $TESTDATASET \
+python -u eval_leadbang.py --network=$NETWORK --method=$METHOD --batch-size=$TEST_BATCHSIZE --data-list $TEST_DATA_LIST_PATH --dataset $TESTDATASET \
  --restore-from=$TEST_RESTORE_FROM  --store-output=$TEST_STORE_RESULT --output-path=$TEST_OUTPUT_PATH --input-size $INPUT_SIZE \
- --use-flip=$TEST_USE_FLIP  --use-ms=$TEST_USE_MS --gpu 0,1,2,3 --predict-choice $PREDICT_CHOICE --whole-scale ${WHOLE_SCALE} > $TEST_LOG_FILE 2>&1
-
+ --use-flip=$TEST_USE_FLIP  --use-ms=$TEST_USE_MS --gpu 0,1,2,3 --data-dir ${DATA_DIR} --predict-choice $PREDICT_CHOICE --whole-scale ${WHOLE_SCALE} 

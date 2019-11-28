@@ -36,26 +36,33 @@ elif torch_ver == '0.3':
     BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')  
 
 from base_oc_block import BaseOC_Context_Module
+BatchNorm2d = nn.BatchNorm2d
 
 class ASP_OC_Module(nn.Module):
     def __init__(self, features, out_features=256, dilations=(12, 24, 36)):
         super(ASP_OC_Module, self).__init__()
         self.context = nn.Sequential(nn.Conv2d(features, out_features, kernel_size=3, padding=1, dilation=1, bias=True),
-                                   InPlaceABNSync(out_features),
+                                   #InPlaceABNSync(out_features),
+                                   nn.BatchNorm2d(out_features),
                                    BaseOC_Context_Module(in_channels=out_features, out_channels=out_features, key_channels=out_features//2, value_channels=out_features, 
                                     dropout=0, sizes=([2])))
         self.conv2 = nn.Sequential(nn.Conv2d(features, out_features, kernel_size=1, padding=0, dilation=1, bias=False),
-                                   InPlaceABNSync(out_features))
+                                   #InPlaceABNSync(out_features))
+                                   nn.BatchNorm2d(out_features))
         self.conv3 = nn.Sequential(nn.Conv2d(features, out_features, kernel_size=3, padding=dilations[0], dilation=dilations[0], bias=False),
-                                   InPlaceABNSync(out_features))
+                                   #InPlaceABNSync(out_features))
+                                   nn.BatchNorm2d(out_features))
         self.conv4 = nn.Sequential(nn.Conv2d(features, out_features, kernel_size=3, padding=dilations[1], dilation=dilations[1], bias=False),
-                                   InPlaceABNSync(out_features))
+                                   #InPlaceABNSync(out_features))
+                                   nn.BatchNorm2d(out_features))
         self.conv5 = nn.Sequential(nn.Conv2d(features, out_features, kernel_size=3, padding=dilations[2], dilation=dilations[2], bias=False),
-                                   InPlaceABNSync(out_features))
+                                   #InPlaceABNSync(out_features))
+                                   nn.BatchNorm2d(out_features))
 
         self.conv_bn_dropout = nn.Sequential(
             nn.Conv2d(out_features * 5, out_features * 2, kernel_size=1, padding=0, dilation=1, bias=False),
-            InPlaceABNSync(out_features * 2),
+            #InPlaceABNSync(out_features * 2),
+            nn.BatchNorm2d(out_features*2),
             nn.Dropout2d(0.1)
             )
         

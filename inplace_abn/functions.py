@@ -91,8 +91,9 @@ class InPlaceABN(autograd.Function):
         bias = bias.contiguous() if ctx.affine else x.new_empty(0)
 
         if ctx.training:
+            print("before mean")
             mean, var = _backend.mean_var(x)
-
+            print("after mean")
             # Update running stats
             running_mean.mul_((1 - ctx.momentum)).add_(ctx.momentum * mean)
             running_var.mul_((1 - ctx.momentum)).add_(ctx.momentum * var * count / (count - 1))
@@ -139,6 +140,7 @@ class InPlaceABNSync(autograd.Function):
     @classmethod
     def forward(cls, ctx, x, weight, bias, running_mean, running_var,
                 extra, training=True, momentum=0.1, eps=1e-05, activation=ACT_LEAKY_RELU, slope=0.01):
+        raise Exception('bn')
         # Save context
         cls._parse_extra(ctx, extra)
         ctx.training = training
@@ -155,26 +157,30 @@ class InPlaceABNSync(autograd.Function):
         bias = bias.contiguous() if ctx.affine else x.new_empty(0)
 
         if ctx.training:
+            print("smean1")
             mean, var = _backend.mean_var(x)
-
+            print("smean2")
             if ctx.is_master:
                 means, vars = [mean.unsqueeze(0)], [var.unsqueeze(0)]
+                print("aaa")
                 for _ in range(ctx.master_queue.maxsize):
                     mean_w, var_w = ctx.master_queue.get()
                     ctx.master_queue.task_done()
                     means.append(mean_w.unsqueeze(0))
                     vars.append(var_w.unsqueeze(0))
-
+                print("bbb")
                 means = comm.gather(means)
                 vars = comm.gather(vars)
-
+                print("ccc")
                 mean = means.mean(0)
                 var = (vars + (mean - means) ** 2).mean(0)
-
+                print("ddd")
                 tensors = comm.broadcast_coalesced((mean, var), [mean.get_device()] + ctx.worker_ids)
                 for ts, queue in zip(tensors[1:], ctx.worker_queues):
                     queue.put(ts)
+                print("ccc")
             else:
+                print("fff")
                 ctx.master_queue.put((mean, var))
                 mean, var = ctx.worker_queue.get()
                 ctx.worker_queue.task_done()
@@ -185,6 +191,7 @@ class InPlaceABNSync(autograd.Function):
 
             # Mark in-place modified tensors
             ctx.mark_dirty(x, running_mean, running_var)
+            print("aaaa")
         else:
             mean, var = running_mean.contiguous(), running_var.contiguous()
             ctx.mark_dirty(x)

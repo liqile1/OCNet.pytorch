@@ -40,6 +40,7 @@ elif torch_ver == '0.3':
     from modules import InPlaceABNSync
     BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')    
 
+BatchNorm2d = nn.BatchNorm2d
 
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes):
@@ -65,13 +66,15 @@ class ResNet(nn.Module):
         # extra added layers
         self.context = nn.Sequential(
                 nn.Conv2d(2048, 512, kernel_size=3, stride=1, padding=1),
-                InPlaceABNSync(512),
+                #InPlaceABNSync(512),
+                nn.BatchNorm2d(512),
                 ASP_OC_Module(512, 256)
                 )
         self.cls = nn.Conv2d(512, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
         self.dsn = nn.Sequential(
             nn.Conv2d(1024, 512, kernel_size=3, stride=1, padding=1),
-            InPlaceABNSync(512),
+            #InPlaceABNSync(512),
+            nn.BatchNorm2d(512),
             nn.Dropout2d(0.10),
             nn.Conv2d(512, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
             )
@@ -83,7 +86,7 @@ class ResNet(nn.Module):
             downsample = nn.Sequential(
                 nn.Conv2d(self.inplanes, planes * block.expansion,
                           kernel_size=1, stride=stride, bias=False),
-                BatchNorm2d(planes * block.expansion,affine = affine_par))
+                nn.BatchNorm2d(planes * block.expansion,affine = affine_par))
 
         layers = []
         generate_multi_grid = lambda index, grids: grids[index%len(grids)] if isinstance(grids, tuple) else 1
@@ -94,21 +97,32 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        print('a')
-        x = self.relu1(self.bn1(self.conv1(x)))
+        #print('a')
+
+        x = self.conv1(x)
+        #print('22')
+        x = self.bn1(x)
+        #print('33')
+        x = self.relu1(x)
+        #print('2')
         x = self.relu2(self.bn2(self.conv2(x)))
+        #print('3')
         x = self.relu3(self.bn3(self.conv3(x)))
+        #print('4')
         x = self.maxpool(x)
+        #print('5')
         x = self.layer1(x)
+        #print('6')
         x = self.layer2(x)
+        #print('7')
         x = self.layer3(x)
-        print('b')
+        #print('b')
         x_dsn = self.dsn(x)
-        print('c')
+        #print('c')
         x = self.layer4(x)
         x = self.context(x)
         x = self.cls(x)
-        print('aa')
+        #print('aa')
         return [x_dsn, x] 
 
 

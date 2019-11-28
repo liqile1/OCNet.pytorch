@@ -177,7 +177,7 @@ class LeadBangTrain(data.Dataset):
 
         # [0, 255] => [0, 1]
         ret, label = cv2.threshold(label, 127, 1, cv2.THRESH_BINARY)
-        
+        label = np.array(label, dtype=np.int64)
         return image.copy(), label.copy(), np.array(size), name
 
 
@@ -186,8 +186,8 @@ class LeadBangTest(data.Dataset):
         scale=True, mirror=True, ignore_label=255, network="resnet101"):
         self.root = root
         # self.crop_h, self.crop_w = crop_size
-        self.crop_h = 480
-        self.crop_w = 480
+        self.crop_h = 512
+        self.crop_w = 512
         self.img_width = 512
         self.img_height = 512
         self.scale = scale
@@ -210,6 +210,7 @@ class LeadBangTest(data.Dataset):
                 "name": str(item_idx),
                 "weight": 1
             })
+            print("label: ", label_file)
             self.cache_img[item_idx] = cv2.imread(img_file)
             self.cache_label[item_idx] = 255-cv2.imread(label_file, 0)
         
@@ -274,7 +275,8 @@ class LeadBangTest(data.Dataset):
 
         # [0, 255] => [0, 1]
         ret, label = cv2.threshold(label, 127, 1, cv2.THRESH_BINARY)
-        
+        label = np.array(label, dtype=np.int64)
+        label = np.asarray(label, dtype=np.int64)    
         return image.copy(), label.copy(), np.array(size), name
 
 

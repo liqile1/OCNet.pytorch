@@ -24,7 +24,7 @@ elif torch_ver == '0.3':
     sys.path.append(os.path.join(BASE_DIR, '../inplace_abn_03'))
     from modules import InPlaceABNSync
     BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')    
-
+BatchNorm2d = nn.BatchNorm2d
 
 def outS(i):
     i = int(i)
