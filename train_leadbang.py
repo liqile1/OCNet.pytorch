@@ -149,8 +149,14 @@ def main():
         labels = Variable(labels.long().cuda())
         optimizer.zero_grad()
         lr = 0.01
-        if epoch > 200:
+        if epoch > 10:
+          lr = 0.006
+        if epoch > 20:
+          lr = 0.003
+        if epoch > 50:
           lr = 0.001
+        if epoch > 300:
+          lr = 0.0005
         if epoch > 2000:
           lr = 0.0001
         #lr = adjust_learning_rate(optimizer, epoch)

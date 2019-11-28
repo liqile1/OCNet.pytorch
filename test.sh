@@ -14,7 +14,7 @@ LEARNING_RATE=1e-2
 WEIGHT_DECAY=5e-4
 START_ITERS=0
 MAX_ITERS=5000
-BATCHSIZE=8
+BATCHSIZE=4
 INPUT_SIZE='512,512'
 USE_CLASS_BALANCE=True
 USE_OHEM=False
@@ -39,7 +39,7 @@ TEST_STORE_RESULT=False
 TEST_BATCHSIZE=1
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="${SNAPSHOT_DIR}CS_scenes_600.pth"
+TEST_RESTORE_FROM="${SNAPSHOT_DIR}CS_scenes_10.pth"
 
 
 ########################################################################################################################

@@ -274,7 +274,7 @@ def main():
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    deeplab = get_segmentation_model("_".join([args.network, args.method]), num_classes=args.num_classes)
+    deeplab = get_segmentation_model("_".join([args.network, args.method]), num_classes=2)
 
     ignore_label = 255
     id_to_trainid = {-1: ignore_label, 0: ignore_label, 1: ignore_label, 2: ignore_label,
@@ -296,7 +296,7 @@ def main():
 
 
     testloader = data.DataLoader(get_segmentation_dataset(args.dataset, root=args.data_dir, network=args.network),
-                                    batch_size=args.batch_size, shuffle=False, pin_memory=True)
+                                    batch_size=1, shuffle=False, pin_memory=True)
 
     result = {}
     for index, batch in enumerate(testloader):
@@ -339,13 +339,13 @@ def main():
                                 args.method, scale=float(args.whole_scale))
 
         seg_pred = np.asarray(np.argmax(output, axis=3), dtype=np.uint8)
-        seg_pred = np.reshape((output.shape[1], output.shape[2]))
+        seg_pred = np.reshape(seg_pred, (output.shape[1], output.shape[2]))
         seg_pred = 255 - 255 * seg_pred
-        result[name] = seg_pred
+        result[name[0]] = seg_pred
             
     for name in result:
         fpath = './dataset/leadbang/test_result/' + name + '.bmp'
-        cv2.imwrite(fpath, result[name[0]])
+        cv2.imwrite(fpath, result[name])
 
 if __name__ == '__main__':
     main()
