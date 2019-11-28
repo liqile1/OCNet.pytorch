@@ -39,7 +39,7 @@ TEST_STORE_RESULT=False
 TEST_BATCHSIZE=1
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="${SNAPSHOT_DIR}CS_scenes_10.pth"
+TEST_RESTORE_FROM="${SNAPSHOT_DIR}CS_scenes_30.pth"
 
 
 ########################################################################################################################
