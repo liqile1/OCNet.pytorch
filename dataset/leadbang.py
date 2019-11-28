@@ -157,7 +157,12 @@ class LeadBangTrain(data.Dataset):
         
 
         if self.network == "resnet101":
-            mean = (102.9801, 115.9465, 122.7717)
+            # mean = (102.9801, 115.9465, 122.7717)
+            # "mean_value_b" : 141.29403686523437,
+            # "mean_value_g" : 123.58832550048828,
+            # "mean_value_r" : 172.43679809570312,
+            mean = (172.43679809570312, 123.58832550048828, 141.29403686523437)
+
             image = image[:,:,::-1]
             image -= mean
         elif self.network == "mobilenetv2":
@@ -256,7 +261,9 @@ class LeadBangTest(data.Dataset):
         
 
         if self.network == "resnet101":
-            mean = (102.9801, 115.9465, 122.7717)
+            # mean = (102.9801, 115.9465, 122.7717)
+            mean = (172.43679809570312, 123.58832550048828, 141.29403686523437)
+
             image = image[:,:,::-1]
             image -= mean
         elif self.network == "mobilenetv2":
@@ -309,7 +316,7 @@ def test_train_leadbang():
         print(lb.shape)
         name = name[0]
         img = np.transpose(img[0], (1,2,0))
-        img += (102.9801, 115.9465, 122.7717)
+        img += (172.43679809570312, 123.58832550048828, 141.29403686523437)
         img = img[:,:,::-1]
         img = np.array(img, dtype=np.uint8)
         lb = 255 - lb[0] * 255
@@ -339,7 +346,7 @@ def test_test_leadbang():
         print(lb.shape)
         name = name[0]
         img = np.transpose(img[0], (1,2,0))
-        img += (102.9801, 115.9465, 122.7717)
+        img += (172.43679809570312, 123.58832550048828, 141.29403686523437)
         img = img[:,:,::-1]
         img = np.array(img, dtype=np.uint8)
         lb = 255 - lb[0] * 255
@@ -350,3 +357,4 @@ def test_test_leadbang():
 
 if __name__ == '__main__':
     test_train_leadbang()
+    # test_test_leadbang()
