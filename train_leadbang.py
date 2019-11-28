@@ -137,7 +137,8 @@ def main():
 
     optimizer.zero_grad()
     print('save pred every: ', args.save_pred_every)
-
+    print('power: ', args.power)
+    print('num steps: ', args.num_steps)
     for epoch in range(5000):
       for i_iter, batch in enumerate(trainloader):
         # sys.stdout.flush()
@@ -148,18 +149,18 @@ def main():
         images = Variable(images.cuda())
         labels = Variable(labels.long().cuda())
         optimizer.zero_grad()
-        lr = 0.01
-        if epoch > 10:
-          lr = 0.006
-        if epoch > 20:
-          lr = 0.003
-        if epoch > 50:
-          lr = 0.001
-        if epoch > 300:
-          lr = 0.0005
-        if epoch > 2000:
-          lr = 0.0001
-        #lr = adjust_learning_rate(optimizer, epoch)
+        #lr = 0.01
+        #if epoch > 50:
+        #  lr = 0.005
+        #if epoch > 300:
+        #  lr = 0.002
+        #if epoch > 800:
+        #  lr = 0.001
+        #if epoch > 2000:
+        #  lr = 0.0005
+        #if epoch > 3000:
+        #  lr = 0.0001
+        lr = adjust_learning_rate(optimizer, epoch)
         #if args.fix_lr:
         #    lr = args.learning_rate
         if i_iter == 0:
