@@ -94,21 +94,30 @@ class LeadBangTrain(data.Dataset):
             angle = angle_max
         return angle
 
-    def rotate(self, image, angle): 
+    def rotate(self, image, angle, border_value=None): 
         center = (self.img_width // 2, self.img_height // 2)
     
         M = cv2.getRotationMatrix2D(center, angle, 1)
-    
-        rotated = cv2.warpAffine(image, M, (self.img_width, self.img_height))
+        if border_value is None:
+            rotated = cv2.warpAffine(image, M, (self.img_width, self.img_height))
+        else:
+            rotated = cv2.warpAffine(image, M, (self.img_width, self.img_height), borderValue=(int(border_value),))
         return rotated
-    
+    def get_border_value(self, mat):
+        r = mat.shape[0]
+        c = mat.shape[1]
+        return (mat[1][1] + mat[1][c - 2] + mat[r-2][1] + mat[r-2][c-2] + mat[2][2] + mat[2][c - 3] + mat[r-3][2] + mat[r-3][c-3]) / 8.0
     def rotate_img_lb(self, image, label, angle):
         b = image[0]
         g = image[1]
         r = image[2]
-        b = self.rotate(b, angle)
-        g = self.rotate(g, angle)
-        r = self.rotate(r, angle)
+        # (102.9801, 115.9465, 122.7717)
+        # b = self.rotate(b, angle, border_value=255 - 102.9801)
+        # g = self.rotate(g, angle, border_value=255-115.9465)
+        # r = self.rotate(r, angle, border_value=255-122.7717)
+        b = self.rotate(b, angle, border_value=self.get_border_value(b))
+        g = self.rotate(g, angle, border_value=self.get_border_value(g))
+        r = self.rotate(r, angle, border_value=self.get_border_value(r))
         label = self.rotate(label, angle)
         image = np.asarray([b, g, r], dtype=np.float32)
         ret, label = cv2.threshold(label, 127, 255, cv2.THRESH_BINARY)
@@ -340,4 +349,4 @@ def test_test_leadbang():
         cv2.waitKey(0)
 
 if __name__ == '__main__':
-    test_test_leadbang()
+    test_train_leadbang()
