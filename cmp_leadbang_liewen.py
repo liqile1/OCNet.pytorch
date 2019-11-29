@@ -7,9 +7,9 @@ if __name__ == "__main__":
     mis_ng = 0
     ng = 0
     ok = 0
-    for idx in range(1463, 2352):
-        label = cv2.imread('dataset/leadbang/label/' + str(idx) + '.bmp', 0)
-        result = cv2.imread('dataset/leadbang/test_result/' + str(idx) + '.bmp', 0)
+    for idx in range(1129, 1589):
+        label = cv2.imread('dataset/leadbang_liewen/label/' + str(idx) + '.bmp', 0)
+        result = cv2.imread('dataset/leadbang_liewen/test_result/' + str(idx) + '.bmp', 0)
         label_defect = len(np.where(label < 100)[0])
         result_defect = len(np.where(result < 100)[0])
         if label_defect > 0 and result_defect == 0:

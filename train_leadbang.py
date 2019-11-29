@@ -106,6 +106,7 @@ def main():
     model.float()
     model.cuda()    
     #model = deeplab
+    #model.train()
     #device=torch.device("cuda:1")
     #model = model.to(device)
     criterion = CriterionCrossEntropy()
@@ -138,8 +139,9 @@ def main():
     optimizer.zero_grad()
     print('save pred every: ', args.save_pred_every)
     print('power: ', args.power)
+    args.num_steps = 1000
     print('num steps: ', args.num_steps)
-    for epoch in range(5000):
+    for epoch in range(1000):
       for i_iter, batch in enumerate(trainloader):
         # sys.stdout.flush()
         i_iter += args.start_iters
@@ -174,6 +176,7 @@ def main():
             preds = model(images)
         #print('los')
         #print(preds)
+        #print(type(labels))
         loss = criterion(preds, labels)
         #print('loss')
         loss.backward()

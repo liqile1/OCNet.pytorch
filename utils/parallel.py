@@ -161,6 +161,9 @@ def _criterion_parallel_apply(modules, inputs, targets, kwargs_tup=None, devices
             device = get_a_var(input).get_device()
         try:
             with torch.cuda.device(device):
+                if kwargs is None:
+                    kwargs = {}
+                #print('inner', type(target))
                 output = module(input, target, **kwargs)
                 # output = module(*(input + target), **kwargs)
             with lock:

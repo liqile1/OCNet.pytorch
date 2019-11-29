@@ -5,9 +5,9 @@ PYTHON="/root/miniconda3/bin/python"
 
 
 #network config
-NETWORK="resnet101"
+NETWORK="mobilenetv2"
 METHOD="asp_oc_dsn"
-DATASET="leadbang_train"
+DATASET="leadbang_liewen_test"
 
 #training settings
 LEARNING_RATE=1e-2
@@ -24,7 +24,7 @@ USE_VAL_SET=False
 USE_EXTRA_SET=False
 
 # replace the DATA_DIR with your folder path to the dataset.
-DATA_DIR='./dataset/leadbang'
+DATA_DIR='./dataset/leadbang_liewen'
 DATA_LIST_PATH='t'
 RESTORE_FROM='./pretrained_model/resnet101-imagenet.pth'
 
@@ -39,13 +39,13 @@ TEST_STORE_RESULT=False
 TEST_BATCHSIZE=1
 PREDICT_CHOICE='whole'
 WHOLE_SCALE='1'
-TEST_RESTORE_FROM="${SNAPSHOT_DIR}CS_scenes_370.pth"
+TEST_RESTORE_FROM="${SNAPSHOT_DIR}CS_scenes_990.pth"
 
 
 ########################################################################################################################
 #  Testing
 ########################################################################################################################
-TESTDATASET="leadbang_test"
+TESTDATASET="leadbang_liewen_test"
 TEST_SET="test"
 TEST_DATA_LIST_PATH="t"
 TEST_LOG_FILE="./log/log_test/log_result_${NETWORK}_${METHOD}_${TEST_SET}_${LEARNING_RATE}_${WEIGHT_DECAY}_${BATCHSIZE}_${MAX_ITERS}_${PREDICT_CHOICE}"

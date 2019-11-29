@@ -344,7 +344,7 @@ def main():
         result[name[0]] = seg_pred
             
     for name in result:
-        fpath = './dataset/leadbang/test_result/' + name + '.bmp'
+        fpath = args.data_dir + '/test_result/' + name + '.bmp'
         cv2.imwrite(fpath, result[name])
 
 if __name__ == '__main__':
